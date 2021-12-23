@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -25,6 +25,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    
 
     @action(detail=True, methods=['get'], name='Cancelar Actividad', permission_classes=[permissions.IsAuthenticated])
     def set_cancelled(self, request, pk=None):
