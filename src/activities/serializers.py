@@ -30,6 +30,9 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         # Verifica que no haya otra actividad cerca del mismo hroario
         if activities.count():
             raise serializers.ValidationError({'schedule': 'No se puede dar de alta una actividad en esta propiedad en esta fecha y hora por que ya hay una actividad asignada.'})
+        # Verifica si la actividad esta cancelada
+        if hasattr(self, 'instance') and hasattr(self.instance, 'status') and self.instance.status == Activity.STATUS_CANCELLED:
+            raise serializers.ValidationError({'status': 'No se puede reagendar la actividad debido a que se encuentra cancelada.'})
         return data
 
 
