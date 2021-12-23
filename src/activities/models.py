@@ -12,7 +12,7 @@ class Property(BaseModel, TimeStampModel):
 
 	address = models.TextField('Dirección')
 	description = models.TextField('Descripción')
-	disabled_at = models.DateTimeField('Inactivar', blank=True, null=True)
+	disabled_at = models.DateTimeField('Inactivar', blank=True, null=True, help_text='Formato: aaaa-mm-dd HH:MM:SS')
 
 
 class Activity(BaseModel, TimeStampModel):
@@ -21,7 +21,7 @@ class Activity(BaseModel, TimeStampModel):
 		verbose_name_plural = 'Actividades'
 
 	property = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name='Propiedad')
-	schedule = models.DateTimeField()
+	schedule = models.DateTimeField(help_text='Formato: aaaa-mm-dd HH:MM:SS')
 
 
 class Survery(TimeStampModel):
