@@ -22,7 +22,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         if self.instance and hasattr(self.instance, 'status'):
             for field in self.fields:
                 self.fields[field].read_only = True
-                if field == 'schedule':
+                if field == 'schedule' or field == 'property':
                     self.fields[field].read_only = False
 
     def validate(self, data):
@@ -32,8 +32,8 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         activities = Activity.objects.filter(
             property=data['property']
         ).filter(
-            schedule__gt=one_hour_after,
-            schedule__lt=one_hour_before
+            schedule__lt=one_hour_after,
+            schedule__gt=one_hour_before
         )
 
         if self.instance:
