@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -22,13 +23,22 @@ class Activity(BaseModel, TimeStampModel):
 	property = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name='Propiedad')
 	schedule = models.DateTimeField('Calendario', help_text='Formato: aaaa-mm-dd HH:MM:SS')
 
+	def get_condition(self):
+		now = timezone.now()
+		condition = self.get_status_display()
+		if self.schedule < now and self.status == 'active':
+			condition = 'Atrasada'
+		elif self.schedule >= now and self.status == 'active':
+			condition = 'Pendiente a realizar'
+		return condition
+
 
 class Survery(TimeStampModel):
 	class Meta:
 		verbose_name = 'Encuesta'
 		verbose_name_plural = 'Encuestas'
 
-	activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name='Actividad')
+	activity = models.OneToOneField(Activity, on_delete=models.CASCADE, verbose_name='Actividad')
 	answers = JSONField()
 
 	def __str__(self):

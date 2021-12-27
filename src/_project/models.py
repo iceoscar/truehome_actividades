@@ -6,12 +6,14 @@ class BaseModel(models.Model):
 	STATUS_DEACTIVATED = 'deactivated'
 	STATUS_CANCELLED = 'cancelled'
 	STATUS_RESCHEDULED = 'rescheduled'
+	STATUS_DONE = 'done'
 
 	CHOICES_STATUS = (
 		(STATUS_ACTIVE, 'Activo'),
 		(STATUS_DEACTIVATED, 'Inactivo'),
 		(STATUS_CANCELLED, 'Cancelado'),
 		(STATUS_RESCHEDULED, 'Re-agendado'),
+		(STATUS_DONE, 'Finalizada'),
 	)
 
 	class Meta:
