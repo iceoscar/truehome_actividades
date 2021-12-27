@@ -26,8 +26,6 @@ class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    
-
     @action(detail=True, methods=['get'], name='Cancelar Actividad', permission_classes=[permissions.IsAuthenticated])
     def set_cancelled(self, request, pk=None):
         activity = self.get_object()

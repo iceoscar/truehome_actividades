@@ -20,7 +20,7 @@ class Activity(BaseModel, TimeStampModel):
 		verbose_name_plural = 'Actividades'
 
 	property = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name='Propiedad')
-	schedule = models.DateTimeField(help_text='Formato: aaaa-mm-dd HH:MM:SS')
+	schedule = models.DateTimeField('Calendario', help_text='Formato: aaaa-mm-dd HH:MM:SS')
 
 
 class Survery(TimeStampModel):

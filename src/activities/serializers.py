@@ -16,11 +16,26 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         model = Activity
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and hasattr(self.instance, 'status'):
+            for field in self.fields:
+                self.fields[field].read_only = True
+                if field == 'schedule':
+                    self.fields[field].read_only = False
+
     def validate(self, data):
         one_hour_before = data['schedule'] - timedelta(hours=1)
         one_hour_after = data['schedule'] + timedelta(hours=1)
 
-        activities = Activity.objects.filter(property=data['property']).exclude(schedule__range=[one_hour_before,one_hour_after])
+        activities = Activity.objects.filter(
+            property=data['property']
+        ).filter(
+            schedule__gt=one_hour_after,
+            schedule__lt=one_hour_before
+        )
+
         if self.instance:
             activities = activities.exclude(pk=self.instance.pk)
 
@@ -33,6 +48,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         # Verifica si la actividad esta cancelada
         if hasattr(self, 'instance') and hasattr(self.instance, 'status') and self.instance.status == Activity.STATUS_CANCELLED:
             raise serializers.ValidationError({'status': 'No se puede reagendar la actividad debido a que se encuentra cancelada.'})
+
         return data
 
 
