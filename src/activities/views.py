@@ -26,25 +26,29 @@ class ActivityViewSet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        today = date.today()
-        tree_days = today - timedelta(days=3)
-        two_weeks = today + timedelta(weeks=2)
-        qs = qs.filter(schedule__gte=tree_days, schedule__lte=two_weeks)
-        return qs
+    filterset_fields = {
+        'schedule': ['date__range'],
+        'status': ['exact']
+    }
 
     def list(self, request, *args, **kwargs):
         items = []
-        for item in self.get_queryset():
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if (not 'status' in request.GET and not 'schedule__date__range' in request.GET) or (not request.GET['status'] and not request.GET['schedule__date__range']):
+            today = date.today()
+            tree_days = today - timedelta(days=3)
+            two_weeks = today + timedelta(weeks=2)
+            queryset = queryset.filter(schedule__gte=tree_days, schedule__lte=two_weeks)
+
+        for item in queryset:
             url_survery = '/encuesta/{}/'.format(item.survery.pk) if hasattr(item, 'survery') else None
             items.append({
                 'id': item.pk,
                 'schedule': item.schedule,
                 'title': item.title,
                 'created_at': item.created_at,
-                'status': item.status,
+                'status': item.get_status_display(),
                 'condition': item.get_condition(),
                 'property': {
                     'id': item.property.pk,
@@ -54,6 +58,12 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 'survery': url_survery
             })
         return Response(items)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = Activity.STATUS_RESCHEDULED
+        instance.save()
+        return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['get'], name='Cancelar Actividad', permission_classes=[permissions.IsAuthenticated])
     def set_cancelled(self, request, pk=None):

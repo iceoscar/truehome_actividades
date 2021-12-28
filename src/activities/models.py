@@ -26,9 +26,9 @@ class Activity(BaseModel, TimeStampModel):
 	def get_condition(self):
 		now = timezone.now()
 		condition = self.get_status_display()
-		if self.schedule < now and self.status == 'active':
+		if self.schedule < now and (self.status == self.STATUS_RESCHEDULED or self.status == self.STATUS_ACTIVE):
 			condition = 'Atrasada'
-		elif self.schedule >= now and self.status == 'active':
+		elif self.schedule >= now and (self.status == self.STATUS_RESCHEDULED or self.status == self.STATUS_ACTIVE):
 			condition = 'Pendiente a realizar'
 		return condition
 
